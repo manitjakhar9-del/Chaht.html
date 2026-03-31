@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+     <html>
+     <head><meta charset="utf-8"><title>Chat Test</title></head>
+     <body>
+       <h2>Chat Memory Test</h2>
+       <div id="log">Loading...</div>
+       <input id="msg" placeholder="Type something">
+       <button onclick="save()">Save</button>
+       <script>
+         document.getElementById('log').textContent = 'JS loaded!';
+         function save() {
+           const m = document.getElementById('msg').value;
+           let h = JSON.parse(localStorage.getItem('test') || '[]');
+           h.push(m);
+           localStorage.setItem('test', JSON.stringify(h));
+           document.getElementById('log').textContent = 'Saved: ' + h.length + ' items';
+         }
+       </script>
+     </body>
+     </html>

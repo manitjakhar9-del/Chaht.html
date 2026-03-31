@@ -1,20 +1,76 @@
 <!DOCTYPE html>
-     <html>
-     <head><meta charset="utf-8"><title>Chat Test</title></head>
-     <body>
-       <h2>Chat Memory Test</h2>
-       <div id="log">Loading...</div>
-       <input id="msg" placeholder="Type something">
-       <button onclick="save()">Save</button>
-       <script>
-         document.getElementById('log').textContent = 'JS loaded!';
-         function save() {
-           const m = document.getElementById('msg').value;
-           let h = JSON.parse(localStorage.getItem('test') || '[]');
-           h.push(m);
-           localStorage.setItem('test', JSON.stringify(h));
-           document.getElementById('log').textContent = 'Saved: ' + h.length + ' items';
-         }
-       </script>
-     </body>
-     </html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Chat - Memory On</title>
+  <style>
+    body { font: 16px sans-serif; margin: 0; background: #f9f9f9; }
+    #chat { height: 75vh; overflow-y: auto; padding: 15px; }
+    .msg { margin: 10px 0; padding: 12px; border-radius: 15px; max-width: 80%; }
+    .user { background: #007bff; color: white; margin-left: auto; }
+    .ai { background: white; margin-right: auto; border: 1px solid #ddd; }
+    #input { width: 70%; padding: 12px; border-radius: 20px; border: 1px solid #ccc; }
+    button { padding: 10px; border: none; background: #007bff; color: white; border-radius: 20px; }
+  </style>
+</head>
+<body>
+  <h2 style="text-align:center;background:#007bff;color:white;padding:15px">💬 AI Chat</h2>
+  <div id="chat">
+    <div class="msg ai">Hi! I'm your AI. Try: \"Remember my name is Manit\"</div>
+  </div>
+  <div style="padding:10px;background:white">
+    <input id="msg" placeholder="Type a message..." autocomplete="off">
+    <button onclick="send()">Send</button>
+  </div>
+
+  <script>
+    let history = JSON.parse(localStorage.getItem('chat')) || [];
+
+    function render() {
+      const c = document.getElementById('chat');
+      c.innerHTML = history.map(m => 
+        `<div class="msg ${m.role}">${m.content}</div>`
+      ).join('');
+      c.scrollTop = c.scrollHeight;
+    }
+
+    // Simulate AI response (no API needed for test)
+    function mockAI(prompt) {
+      const responses = {
+        'hi': 'Hello! How can I help?',
+        'remember': 'Got it! I’ll remember that.',
+        'number': 'You mentioned a number earlier — could you remind me?',
+        'what': 'I’m learning as we chat! Ask me anything.'
+      };
+      const key = Object.keys(responses).find(k => prompt.toLowerCase().includes(k));
+      return key ? responses[key] : `I received: "${prompt}". What would you like to do next?`;
+    }
+
+    async function send() {
+      const text = document.getElementById('msg').value.trim();
+      if (!text) return;
+
+      history.push({ role: 'user', content: text });
+      localStorage.setItem('chat', JSON.stringify(history));
+      render();
+      document.getElementById('msg').value = '';
+
+      // Simulate AI thinking
+      setTimeout(() => {
+        const reply = mockAI(text);
+        history.push({ role: 'ai', content: reply });
+        localStorage.setItem('chat', JSON.stringify(history));
+        render();
+      }, 800);
+    }
+
+    document.getElementById('msg').addEventListener('keypress', e => {
+      if (e.key === 'Enter') send();
+    });
+
+    render();
+    console.log('Chat loaded with', history.length, 'messages');
+  </script>
+</body>
+</html>
